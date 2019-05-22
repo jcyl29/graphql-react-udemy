@@ -17,7 +17,7 @@ class LyriCreate extends Component {
         content: this.state.content,
         songId: this.props.songId
       }
-    }).then(() => this.setState({ content: '' }));
+    }).then(() => this.setState({ content: '' }));  
   }
 
   render() {
@@ -39,7 +39,9 @@ const mutation = gql`
       id
       title
       lyrics {
+        id
         content
+        likes
       }
     }
   }

@@ -3,11 +3,38 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 class LyricList extends Component {
+  onLike(id, likes) {
+    this.props.mutate({
+      variables: { id },
+      optimisticResponse: {
+        // we want to "guess" what the response will be from successfully
+        // running the mutation
+        // we mimic the response payload
+        // and modify to tell the app what we expect the result should be.
+        // in this case, expecting the like counter to increment by 1
+        ___typename: 'Mutation',
+        likeLyric: { 
+          id,
+          ___typename: 'LyricType',
+          likes: likes + 1
+        }
+      }
+    });
+  }
+
   renderLyrics() {
-    return this.props.lyrics.map(({ id, content }) => {
+    return this.props.lyrics.map(({ id, content, likes }) => {
       return (
         <li key={id} className='collection-item'>
           {content}
+          <div className="vote-box">
+            <i
+              className="material-icons"
+              onClick={() => this.onLike(id, likes)}
+            >
+              thumb_up</i>
+            {likes}
+          </div>
         </li>
       )
     })
@@ -22,4 +49,13 @@ class LyricList extends Component {
   }
 }
 
-export default LyricList
+const mutation = gql`
+  mutation LikeLyric($id: ID) {
+    likeLyric(id: $id) {
+      id
+      likes
+    } 
+  }
+`;
+
+export default graphql(mutation)(LyricList);
